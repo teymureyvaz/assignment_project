@@ -34,19 +34,18 @@ class PostStatisticsByPostIdView(APIView):
 
     def get(self, request, post_id):
         obj = PostStatistics.objects.filter(post_id=post_id).latest('created_at').__dict__
-        print(obj)
-
         serializer = PostStatisticsSerializer(data=obj)
         if serializer.is_valid():
-            print(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            print(serializer.errors)
+            return Response({"status": "Bad request"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PostStatisticsByUserIdView(APIView):
     def get(self, request, user_id):
         obj = PostStatistics.objects.filter(user_id=user_id)
+        if not obj:
+            return Response({"status": "Not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = PostStatisticsSerializer(instance=obj, many=True)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
