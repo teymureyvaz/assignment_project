@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,30 +24,32 @@ class PostCreateView(APIView):
                         post_statistics.save()
 
                 except DatabaseError:
-                    Response({"failure": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    Response({"message": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({"failure": "Bad request"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Bad request"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"success": "{} posts saved successfully".format(len(request.data))},
+        return Response({"message": "{} posts saved successfully".format(len(request.data))},
                         status=status.HTTP_201_CREATED)
 
 
 class PostStatisticsByPostIdView(APIView):
 
     def get(self, request, post_id):
-        obj = PostStatistics.objects.filter(post_id=post_id).latest('created_at').__dict__
+        try:
+            obj = PostStatistics.objects.filter(post_id=post_id).latest('created_at').__dict__
+        except:
+            return Response({"message": "Not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = PostStatisticsSerializer(data=obj)
-        if serializer.is_valid():
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"status": "Bad request"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class PostStatisticsByUserIdView(APIView):
     def get(self, request, user_id):
         obj = PostStatistics.objects.filter(user_id=user_id)
         if not obj:
-            return Response({"status": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = PostStatisticsSerializer(instance=obj, many=True)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -10,6 +10,7 @@ class PostSerializer(serializers.Serializer):
 
 class PostStatisticsSerializer(serializers.ModelSerializer):
     post_id = serializers.IntegerField(source='post.id')
+
     class Meta:
         model = PostStatistics
         fields = ("user_id", "post_id", "likes_count")

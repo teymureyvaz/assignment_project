@@ -15,12 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from api.views import PostCreateView,PostStatisticsByPostIdView,PostStatisticsByUserIdView
+from api.views import PostCreateView, PostStatisticsByPostIdView, PostStatisticsByUserIdView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('post/store', PostCreateView.as_view(), name='store'),
-    path('post/statistics_by_post_id/<int:post_id>', PostStatisticsByPostIdView.as_view(), name="statistics_by_post_id"),
+    path('post/statistics_by_post_id/<int:post_id>', PostStatisticsByPostIdView.as_view(),
+         name="statistics_by_post_id"),
     path('post/statistics_by_user_id/<int:user_id>', PostStatisticsByUserIdView.as_view(),
-         name="statistics_by_user_id"),
-
+         name="statistics_by_user_id")
 ]
