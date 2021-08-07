@@ -8,16 +8,14 @@ from .serializers import PostSerializer, PostStatisticsSerializer
 
 class PostCreateView(APIView):
     def post(self, request):
-        Post.objects.all().delete()
-        PostStatistics.objects.all().delete()
         serializer = PostSerializer(data=request.data, many=True)
         if serializer.is_valid():
             for item in request.data:
                 try:
                     with transaction.atomic():
-                        post = Post.objects.filter(post_id=item['post_id']).first()
+                        post = Post.objects.filter(id=item['post_id']).first()
                         if post is None:
-                            post = Post(post_id=item['post_id'], user_id=item['user_id'])
+                            post = Post(id=item['post_id'], user_id=item['user_id'])
                             post.save()
                         post_statistics = PostStatistics(post=post, likes_count=item['likes_count'],
                                                          user_id=item['user_id'])
@@ -33,6 +31,7 @@ class PostCreateView(APIView):
 
 
 class PostStatisticsByPostIdView(APIView):
+
     def get(self, request, post_id):
         obj = PostStatistics.objects.filter(post_id=post_id).latest('created_at').__dict__
         print(obj)
@@ -40,7 +39,7 @@ class PostStatisticsByPostIdView(APIView):
         serializer = PostStatisticsSerializer(data=obj)
         if serializer.is_valid():
             print(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
 

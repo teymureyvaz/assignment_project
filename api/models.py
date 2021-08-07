@@ -3,7 +3,6 @@ from django.utils import timezone
 
 
 class Post(models.Model):
-    post_id = models.IntegerField()
     user_id = models.IntegerField()
 
 class PostStatistics(models.Model):
